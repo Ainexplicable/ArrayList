@@ -3,7 +3,7 @@
 #define _ARRAY_LIST_H
 
 #include <stdlib.h>
-#include <memory.h>
+#include <string.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>

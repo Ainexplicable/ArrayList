@@ -133,9 +133,9 @@ void insert(ArrayList *list, int index, TYPE value)
     if (!is_position_index(list, index))
         handle_index_out_of_range();
     auto_expand(list);
-    memcpy(list->arr + index + 1,
-           list->arr + index,
-           sizeof *list->arr * (list->size - index));
+    memmove(list->arr + index + 1,
+            list->arr + index,
+            sizeof(TYPE) * (list->size - index));
     list->arr[index] = value;
     list->size++;
 }
@@ -152,9 +152,9 @@ TYPE erase(ArrayList *list, int index)
     if (!is_element_index(list, index))
         handle_index_out_of_range();
     TYPE old_val = list->arr[index];
-    memcpy(list->arr + index,
-           list->arr + index + 1,
-           sizeof *list->arr * (list->size - index - 1));
+    memmove(list->arr + index,
+            list->arr + index + 1,
+            sizeof(TYPE) * (list->size - index - 1));
     list->size--;
     return old_val;
 }
