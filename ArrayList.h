@@ -11,11 +11,7 @@
 #define TYPE int
 #define DEFAULT_CAPACITY 10
 
-#define ERROR_INDEX_OUT_OF_RANGE 1
-#define ERROR_MEMORY_ERROR 2
-
-typedef struct ArrayList
-{
+typedef struct ArrayList {
     TYPE *arr;
     int size;
     int capacity;
@@ -23,7 +19,7 @@ typedef struct ArrayList
 
 ArrayList *new_array_list();
 
-void set_list_capacity(ArrayList *list, int new_capacity);
+void set_list_capacity(ArrayList *list, int n);
 
 void shrink_to_fit(ArrayList *list);
 

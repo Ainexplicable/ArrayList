@@ -1,30 +1,31 @@
 #include "ArrayList.h"
 
+#define ERROR_INDEX_OUT_OF_BOUNDS 1
+#define ERROR_MEMORY_ERROR 2
+
 // private
 
-_Bool is_element_index(ArrayList *list, int index)
-{
+_Bool is_element_index(ArrayList *list, int index) {
     return index >= 0 && index < list->size;
 }
 
-_Bool is_position_index(ArrayList *list, int index)
-{
+_Bool is_position_index(ArrayList *list, int index) {
     return index >= 0 && index <= list->size;
 }
 
-void handle_index_out_of_range()
-{
+void handle_index_out_of_range() {
     puts("ERROR: ArrayList: Index out of range.");
-    exit(ERROR_INDEX_OUT_OF_RANGE);
+    exit(ERROR_INDEX_OUT_OF_BOUNDS);
 }
 
-/**
- * use before inserting
- */
-void auto_expand(ArrayList *list)
-{
-    if (list->size == list->capacity)
-    {
+void handle_memory_error() {
+    puts("ERROR: ArrayList: Cannot (re)allocate memory.");
+    exit(ERROR_MEMORY_ERROR);
+}
+
+// use before inserting
+void auto_expand(ArrayList *list) {
+    if (list->size == list->capacity) {
         int new_capacity = __max(DEFAULT_CAPACITY,
                                  list->capacity + (list->capacity >> 1));
         set_list_capacity(list, new_capacity);
@@ -38,8 +39,7 @@ void auto_expand(ArrayList *list)
  *
  * @return ArrayList*
  */
-ArrayList *new_array_list()
-{
+ArrayList *new_array_list() {
     ArrayList *list = malloc(sizeof(ArrayList));
     if (!list)
         return NULL;
@@ -49,30 +49,28 @@ ArrayList *new_array_list()
     return list;
 }
 
-void set_list_capacity(ArrayList *list, int new_capacity)
-{
-    if (new_capacity == 0)
-    {
+/**
+ * @brief Change the container capacity to n elements.
+ *
+ * @param list
+ * @param n New container capacity, expressed in number of elements.
+ */
+void set_list_capacity(ArrayList *list, int n) {
+    if (n == 0) {
         free(list->arr);
         list->arr = NULL;
         list->capacity = 0;
         list->size = 0;
-    }
-    else
-    {
-        TYPE *new_arr = realloc(list->arr, sizeof *new_arr * new_capacity);
-        if (new_arr)
-        {
+    } else {
+        TYPE *new_arr = realloc(list->arr, sizeof *new_arr * n);
+        if (new_arr) {
             list->arr = new_arr;
-            list->capacity = new_capacity;
+            list->capacity = n;
             list->size = __min(list->capacity, list->size);
-        }
-        else
-        {
+        } else {
             free(list->arr);
             free(list);
-            puts("ERROR: ArrayList: Cannot (re)allocate memory.");
-            exit(ERROR_MEMORY_ERROR);
+            handle_memory_error();
         }
     }
 }
@@ -82,8 +80,7 @@ void set_list_capacity(ArrayList *list, int new_capacity)
  *
  * @param list
  */
-void shrink_to_fit(ArrayList *list)
-{
+void shrink_to_fit(ArrayList *list) {
     set_list_capacity(list, list->size);
 }
 
@@ -100,8 +97,7 @@ void shrink_to_fit(ArrayList *list)
  * @param list
  * @param value Value to be copied (or moved) to the new element.
  */
-void push_back(ArrayList *list, TYPE value)
-{
+void push_back(ArrayList *list, TYPE value) {
     auto_expand(list);
     list->arr[list->size++] = value;
 }
@@ -114,8 +110,7 @@ void push_back(ArrayList *list, TYPE value)
  *
  * @param list
  */
-void pop_back(ArrayList *list)
-{
+void pop_back(ArrayList *list) {
     if (list->size == 0)
         return;
     list->arr[--list->size] = 0;
@@ -128,8 +123,7 @@ void pop_back(ArrayList *list)
  * @param index
  * @param value
  */
-void insert(ArrayList *list, int index, TYPE value)
-{
+void insert(ArrayList *list, int index, TYPE value) {
     if (!is_position_index(list, index))
         handle_index_out_of_range();
     auto_expand(list);
@@ -147,8 +141,7 @@ void insert(ArrayList *list, int index, TYPE value)
  * @param index
  * @return TYPE
  */
-TYPE erase(ArrayList *list, int index)
-{
+TYPE erase(ArrayList *list, int index) {
     if (!is_element_index(list, index))
         handle_index_out_of_range();
     TYPE old_val = list->arr[index];
@@ -167,8 +160,7 @@ TYPE erase(ArrayList *list, int index)
  * @param value
  * @return TYPE
  */
-TYPE set(ArrayList *list, int index, TYPE value)
-{
+TYPE set(ArrayList *list, int index, TYPE value) {
     if (!is_element_index(list, index))
         handle_index_out_of_range();
     TYPE old_val = list->arr[index];
@@ -183,8 +175,7 @@ TYPE set(ArrayList *list, int index, TYPE value)
  * @param index
  * @return TYPE
  */
-TYPE get(ArrayList *list, int index)
-{
+TYPE get(ArrayList *list, int index) {
     if (!is_element_index(list, index))
         handle_index_out_of_range();
     return list->arr[index];
@@ -198,8 +189,7 @@ TYPE get(ArrayList *list, int index)
  * @param value
  * @return int
  */
-int index_of(ArrayList *list, TYPE value)
-{
+int index_of(ArrayList *list, TYPE value) {
     for (int i = 0; i < list->size; ++i)
         if (list->arr[i] == value)
             return i;
@@ -214,8 +204,7 @@ int index_of(ArrayList *list, TYPE value)
  * @param value
  * @return int
  */
-int last_index_of(ArrayList *list, TYPE value)
-{
+int last_index_of(ArrayList *list, TYPE value) {
     for (int i = list->size - 1; i >= 0; --i)
         if (list->arr[i] == value)
             return i;
@@ -227,8 +216,7 @@ int last_index_of(ArrayList *list, TYPE value)
  *
  * @param list
  */
-void clear(ArrayList *list)
-{
+void clear(ArrayList *list) {
     memset(list->arr, 0, sizeof *list->arr * list->size);
     list->size = 0;
 }
@@ -240,8 +228,7 @@ void clear(ArrayList *list)
  *
  * @param list
  */
-void destruct_array_list(ArrayList *list)
-{
+void destruct_array_list(ArrayList *list) {
     free(list->arr);
     free(list);
 }
@@ -251,11 +238,9 @@ void destruct_array_list(ArrayList *list)
  *
  * @param list
  */
-void out_string(ArrayList *list)
-{
+void out_string(ArrayList *list) {
     printf("[");
-    if (list->size)
-    {
+    if (list->size) {
         printf("%d", list->arr[0]);
         for (int i = 1; i < list->size; ++i)
             printf(", %d", list->arr[i]);

@@ -1,21 +1,27 @@
 #include <stdio.h>
 #include "ArrayList.h"
 
-void print_size_and_capacity(ArrayList *list)
-{
+void print_size_and_capacity(ArrayList *list) {
     printf("size = %d\tcapacity = %d\n", list->size, list->capacity);
 }
 
-int main()
-{
+void follow_capacity(ArrayList *list, int range) {
+    print_size_and_capacity(list);
+    int capacity = list->capacity;
+    for (int i = 0; i < range; i++) {
+        push_back(list, i);
+        if (capacity != list->capacity) {
+            print_size_and_capacity(list);
+            capacity = list->capacity;
+        }
+    }
+}
+
+int main() {
     ArrayList *list = new_array_list();
     // push_back
     puts("Testing push_back:");
-    for (int i = 0; i < 23; i++)
-    {
-        push_back(list, i);
-        print_size_and_capacity(list);
-    }
+    follow_capacity(list, 50);
     out_string(list);
     puts("");
 
@@ -78,7 +84,13 @@ int main()
 
     // clear the list
     puts("Testing clear:");
+    puts("before clear:");
+    for (int i = 0; i < 20; i++)
+        insert(list, list->size, 0);
+    print_size_and_capacity(list);
+    puts("clearing...");
     clear(list);
+    print_size_and_capacity(list);
     out_string(list);
     destruct_array_list(list);
     return 0;
